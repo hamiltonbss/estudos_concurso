@@ -1,0 +1,471 @@
+{% extends "base.html" %}
+
+{% block title %}{{ concurso.nome }} - {{ app_name }}{% endblock %}
+
+{% block content %}
+<section class="card main-card">
+    <div class="concurso-header">
+        <div class="concurso-title">
+            <h2><i class="fas fa-trophy"></i> {{ concurso.nome }}</h2>
+            {% if concurso.banca %}
+            <span class="banca-tag"><i class="fas fa-university"></i> {{ concurso.banca }}</span>
+            {% endif %}
+        </div>
+
+        <div class="concurso-status">
+            <div class="status-item">
+                <span class="status-label"><i class="fas fa-calendar-day"></i> Data da Prova</span>
+                <span class="status-value">{{ concurso.data_prova|datetimeformat }}</span>
+            </div>
+
+            <div class="status-item">
+                <span class="status-label"><i class="fas fa-clock"></i> Contagem Regressiva</span>
+                <span class="status-value countdown {% if dias_restantes < 30 %}urgente{% elif dias_restantes < 90 %}atencao{% endif %}">
+                    {{ dias_restantes }} dias restantes
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <div class="concurso-actions">
+        <div class="action-buttons">
+            <button id="btn-nova-disciplina" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Nova Disciplina
+            </button>
+            <button id="btn-cronograma" class="btn btn-secondary">
+                <i class="fas fa-calendar-alt"></i> Gerar Cronograma
+            </button>
+        </div>
+
+        <div id="form-nova-disciplina" class="action-form" style="display: none;">
+            <form action="{{ url_for('adicionar_disciplina', id_concurso=concurso.id) }}" method="POST">
+                <div class="form-header">
+                    <h3><i class="fas fa-plus-circle"></i> Nova Disciplina</h3>
+                    <button type="button" class="btn-close" id="close-form-disciplina">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="form-body">
+                    <div class="form-group">
+                        <label for="nome-disciplina">Nome da Disciplina:</label>
+                        <input type="text" id="nome-disciplina" name="nome" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Prioridade:</label>
+                        <div class="priority-selector">
+                            <label class="priority-option">
+                                <input type="radio" name="prioridade" value="alta">
+                                <span class="priority-badge alta">Alta</span>
+                            </label>
+                            <label class="priority-option">
+                                <input type="radio" name="prioridade" value="media" checked>
+                                <span class="priority-badge media">Média</span>
+                            </label>
+                            <label class="priority-option">
+                                <input type="radio" name="prioridade" value="baixa">
+                                <span class="priority-badge baixa">Baixa</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="peso-disciplina">Peso na prova (1-10):</label>
+                        <div class="slider-container">
+                            <input type="range" id="peso-disciplina" name="peso" min="1" max="10" value="1" required>
+                            <div class="range-value">1</div>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" id="cancel-disciplina">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Salvar</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div id="form-cronograma" class="action-form" style="display: none;">
+            <form action="{{ url_for('gerar_cronograma', id_concurso=concurso.id) }}" method="POST">
+                <div class="form-header">
+                    <h3><i class="fas fa-calendar-alt"></i> Gerar Cronograma de Estudos</h3>
+                    <button type="button" class="btn-close" id="close-form-cronograma">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="form-body">
+                    <div class="form-group">
+                        <label for="horas-por-dia">Horas disponíveis por dia:</label>
+                        <div class="hours-selector">
+                            <input type="number" id="horas-por-dia" name="horas_por_dia" min="0.5" step="0.5" value="3" required>
+                            <span class="hours-unit">horas</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="dias-semana">Dias da semana disponíveis:</label>
+                        <div class="weekdays-selector">
+                            <label class="weekday"><input type="checkbox" name="dias_semana" value="1" checked> Seg</label>
+                            <label class="weekday"><input type="checkbox" name="dias_semana" value="2" checked> Ter</label>
+                            <label class="weekday"><input type="checkbox" name="dias_semana" value="3" checked> Qua</label>
+                            <label class="weekday"><input type="checkbox" name="dias_semana" value="4" checked> Qui</label>
+                            <label class="weekday"><input type="checkbox" name="dias_semana" value="5" checked> Sex</label>
+                            <label class="weekday"><input type="checkbox" name="dias_semana" value="6" checked> Sáb</label>
+                            <label class="weekday"><input type="checkbox" name="dias_semana" value="0" checked> Dom</label>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" id="cancel-cronograma">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Gerar</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+<div class="disciplinas-container">
+    {% if disciplinas %}
+        {% for disciplina in disciplinas %}
+        <section class="card disciplina-card">
+            <div class="disciplina-header">
+                <div class="disciplina-title">
+                    <h3>
+                        <i class="fas fa-book"></i> {{ disciplina.nome }}
+                        {% if disciplina.peso > 1 %}
+                        <span class="tag peso-tag">
+                            <i class="fas fa-weight-hanging"></i> Peso {{ disciplina.peso }}
+                        </span>
+                        {% endif %}
+                    </h3>
+                    <div class="disciplina-tags">
+                        <span class="tag prioridade-tag {{ disciplina.prioridade }}">
+                            {{ disciplina.prioridade|capitalize }}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="progress-display">
+                    <div class="progress-info">
+                        <span class="progress-percentage">{{ disciplina.progresso }}%</span>
+                        <span class="progress-label">Completo</span>
+                    </div>
+                    <div class="progress-container">
+                        <div class="progress-bar" style="width: {{ disciplina.progresso }}%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="disciplina-actions">
+                <a href="{{ url_for('view_disciplina', id_disciplina=disciplina.id) }}" class="btn btn-primary">
+                    <i class="fas fa-eye"></i> Ver Detalhes
+                </a>
+                <button class="btn btn-secondary btn-add-topico" data-disciplina="{{ disciplina.id }}">
+                    <i class="fas fa-plus"></i> Tópico
+                </button>
+            </div>
+        </section>
+        {% endfor %}
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-icon">
+            <i class="fas fa-book"></i>
+        </div>
+        <h3>Nenhuma disciplina cadastrada</h3>
+        <p>Comece adicionando disciplinas para o seu concurso</p>
+        <button id="btn-empty-nova-disciplina" class="btn btn-lg btn-primary">
+            <i class="fas fa-plus"></i> Adicionar Disciplina
+        </button>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Novo Modal para Criação de Disciplina -->
+<div id="modal-nova-disciplina" class="modal" style="display: none;">
+  <div class="modal-content" style="background: white; margin: 15% auto; padding: 20px; border-radius: 8px; width: 90%; max-width: 500px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+    <span class="close-modal" style="float: right; font-size: 24px; cursor: pointer; color: #aaa;">&times;</span>
+    <h3 style="margin-top: 0; color: #333;"><i class="fas fa-plus-circle"></i> Nova Disciplina</h3>
+    
+    <form action="{{ url_for('adicionar_disciplina', id_concurso=concurso.id) }}" method="POST">
+      <div style="margin-bottom: 15px;">
+        <label style="display: block; margin-bottom: 5px; color: #555;">Nome da Disciplina:</label>
+        <input type="text" name="nome" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;" required>
+      </div>
+      
+      <div style="margin-bottom: 15px;">
+        <label style="display: block; margin-bottom: 5px; color: #555;">Prioridade:</label>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+          <label style="display: flex; align-items: center; cursor: pointer;">
+            <input type="radio" name="prioridade" value="alta" style="margin-right: 5px;">
+            <span style="padding: 5px 10px; background: #ffecec; color: #d33; border-radius: 20px; font-size: 0.9rem;">Alta</span>
+          </label>
+          <label style="display: flex; align-items: center; cursor: pointer;">
+            <input type="radio" name="prioridade" value="media" checked style="margin-right: 5px;">
+            <span style="padding: 5px 10px; background: #fff8e6; color: #e68a00; border-radius: 20px; font-size: 0.9rem;">Média</span>
+          </label>
+          <label style="display: flex; align-items: center; cursor: pointer;">
+            <input type="radio" name="prioridade" value="baixa" style="margin-right: 5px;">
+            <span style="padding: 5px 10px; background: #e6f7ff; color: #1890ff; border-radius: 20px; font-size: 0.9rem;">Baixa</span>
+          </label>
+        </div>
+      </div>
+      
+      <div style="margin-bottom: 15px;">
+        <label style="display: block; margin-bottom: 5px; color: #555;">Peso na prova (1-10):</label>
+        <input type="range" name="peso" min="1" max="10" value="1" style="width: 100%; margin-bottom: 5px;" required>
+        <div style="text-align: center; font-weight: bold; font-size: 1.1rem;">1</div>
+      </div>
+      
+      <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+        <button type="button" class="close-modal" style="padding: 8px 16px; background: #f0f0f0; border: none; border-radius: 4px; cursor: pointer;">Cancelar</button>
+        <button type="submit" style="padding: 8px 16px; background: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer;">Salvar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<style>
+.disciplinas-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+.disciplina-card {
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+    border-radius: 8px;
+    background: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.disciplina-header {
+    margin-bottom: 1rem;
+}
+
+.disciplina-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.5rem;
+}
+
+.disciplina-title h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    color: #333;
+}
+
+.tag {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.peso-tag {
+    background-color: #e6f7ff;
+    color: #1890ff;
+}
+
+.prioridade-tag.alta {
+    background-color: #fff2f0;
+    color: #f5222d;
+}
+
+.prioridade-tag.media {
+    background-color: #fffbe6;
+    color: #faad14;
+}
+
+.prioridade-tag.baixa {
+    background-color: #f6ffed;
+    color: #52c41a;
+}
+
+.progress-display {
+    margin: 1rem 0;
+}
+
+.progress-info {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.progress-percentage {
+    font-weight: bold;
+    color: #333;
+}
+
+.progress-label {
+    color: #666;
+}
+
+.progress-container {
+    height: 8px;
+    background-color: #f0f0f0;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    background-color: #4CAF50;
+    transition: width 0.3s ease;
+}
+
+.disciplina-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: auto;
+    padding-top: 1rem;
+    border-top: 1px solid #f0f0f0;
+}
+
+.disciplina-actions .btn {
+    flex: 1;
+    text-align: center;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 2rem;
+    grid-column: 1 / -1;
+}
+
+.empty-icon {
+    font-size: 3rem;
+    color: #ccc;
+    margin-bottom: 1rem;
+}
+
+.empty-state h3 {
+    margin: 0.5rem 0;
+    color: #333;
+}
+
+.empty-state p {
+    color: #666;
+    margin-bottom: 1.5rem;
+}
+
+/* Estilos do Modal */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+    animation: modalopen 0.3s;
+    position: relative;
+}
+
+@keyframes modalopen {
+    from {opacity: 0; transform: translateY(-50px);}
+    to {opacity: 1; transform: translateY(0);}
+}
+
+.close-modal {
+    transition: 0.3s;
+}
+
+.close-modal:hover {
+    color: #333;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .disciplinas-container {
+        grid-template-columns: 1fr;
+    }
+    
+    .modal-content {
+        width: 95%;
+        margin: 20% auto;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Controles do formulário de nova disciplina
+    const btnNovaDisciplina = document.getElementById('btn-nova-disciplina');
+    const btnEmptyNovaDisciplina = document.getElementById('btn-empty-nova-disciplina');
+    const formNovaDisciplina = document.getElementById('form-nova-disciplina');
+    
+    // Controles do modal de nova disciplina
+    const modalNovaDisciplina = document.getElementById('modal-nova-disciplina');
+    const closeModalButtons = document.querySelectorAll('.close-modal');
+    
+    // Abrir modal/fomulário existente
+    if (btnNovaDisciplina) {
+        btnNovaDisciplina.addEventListener('click', function() {
+            modalNovaDisciplina.style.display = 'block';
+            // Mantém o formulário original escondido
+            formNovaDisciplina.style.display = 'none';
+        });
+    }
+    
+    if (btnEmptyNovaDisciplina) {
+        btnEmptyNovaDisciplina.addEventListener('click', function() {
+            modalNovaDisciplina.style.display = 'block';
+        });
+    }
+    
+    // Fechar modal
+    closeModalButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            modalNovaDisciplina.style.display = 'none';
+        });
+    });
+    
+    // Fechar ao clicar fora
+    window.addEventListener('click', function(event) {
+        if (event.target === modalNovaDisciplina) {
+            modalNovaDisciplina.style.display = 'none';
+        }
+    });
+    
+    // Atualizar valor do range no modal
+    const pesoRangeModal = modalNovaDisciplina.querySelector('input[type="range"]');
+    if (pesoRangeModal) {
+        pesoRangeModal.addEventListener('input', function() {
+            this.nextElementSibling.textContent = this.value;
+        });
+    }
+    
+    // Mantém a funcionalidade original do range no formulário antigo
+    const pesoRangeOriginal = document.getElementById('peso-disciplina');
+    if (pesoRangeOriginal) {
+        pesoRangeOriginal.addEventListener('input', function() {
+            document.querySelector('.range-value').textContent = this.value;
+        });
+    }
+
+    // Controles do formulário de cronograma (mantido original)
+    const btnCronograma = document.getElementById('btn-cronograma');
+    const formCronograma = document.getElementById('form-cronograma');
+    
+    if (btnCronograma) {
+        btnCronograma.addEventListener('click', function() {
+            formCronograma.style.display = formCronograma.style.display === 'block' ? 'none' : 'block';
+        });
+    }
+    
+    document.getElementById('close-form-cronograma')?.addEventListener('click', function() {
+        formCronograma.style.display = 'none';
+    });
+    
+    document.getElementById('cancel-cronograma')?.addEventListener('click', function() {
+        formCronograma.style.display = 'none';
+    });
+});
+</script>
+{% endblock %}

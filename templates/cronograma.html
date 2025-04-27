@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% block title %}{{ concurso.nome }} - Cronograma{% endblock %}
+
+{% block content %}
+<div class="cronograma-container">
+    <h1>Cronograma de Estudos</h1>
+    <p class="info-prova">Prova: {{ concurso.data_prova }} | Horas/dia: {{ horas_por_dia }}h</p>
+
+    <div class="cards-container">
+        {% for data, atividades in cronograma|groupby('data') %}
+        <div class="study-card">
+            <div class="card-date">{{ data }}</div>
+            <div class="card-body">
+                {% for item in atividades %}
+                <div class="card-item {{ 'study' if item.tipo == 'Estudo' else 'exercise' }}">
+                    <div class="item-content">
+                        {% if item.tipo == 'Exercícios' %}
+                        <div class="exercise-label">Exercícios:</div>
+                        {% endif %}
+                        <div class="item-title">{{ item.topico }}</div>
+                        <div class="item-discipline">{{ item.disciplina }}</div>
+                    </div>
+                    <div class="item-hours">{{ item.horas }}h</div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+    .cronograma-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+        font-family: Arial, sans-serif;
+    }
+    
+    h1 {
+        color: #333;
+        text-align: center;
+        margin-bottom: 10px;
+    }
+    
+    .info-prova {
+        text-align: center;
+        color: #666;
+        margin-bottom: 30px;
+    }
+    
+    .cards-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        justify-content: flex-start;
+    }
+    
+    .study-card {
+        width: 300px;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        overflow: hidden;
+        background: white;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        margin-bottom: 20px;
+    }
+    
+    .card-date {
+        background: #2c3e50;
+        color: white;
+        padding: 10px;
+        font-weight: bold;
+        text-align: center;
+        font-size: 1.1em;
+    }
+    
+    .card-body {
+        padding: 15px;
+    }
+    
+    .card-item {
+        margin-bottom: 12px;
+        padding: 10px;
+        border-radius: 6px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .study {
+        background: #e8f4fc;
+        border-left: 4px solid #3498db;
+    }
+    
+    .exercise {
+        background: #fef6e6;
+        border-left: 4px solid #f39c12;
+    }
+    
+    .exercise-label {
+        font-weight: bold;
+        color: #d35400;
+        font-size: 0.9em;
+        margin-bottom: 3px;
+    }
+    
+    .item-content {
+        flex-grow: 1;
+    }
+    
+    .item-title {
+        font-weight: bold;
+        margin-bottom: 5px;
+        color: #2c3e50;
+    }
+    
+    .item-discipline {
+        color: #7f8c8d;
+        font-size: 0.9em;
+    }
+    
+    .item-hours {
+        background: rgba(0,0,0,0.1);
+        padding: 3px 10px;
+        border-radius: 12px;
+        font-size: 0.9em;
+        font-weight: bold;
+        margin-left: 10px;
+        white-space: nowrap;
+    }
+</style>
+{% endblock %}

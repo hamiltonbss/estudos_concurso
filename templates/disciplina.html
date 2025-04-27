@@ -1,0 +1,220 @@
+{% extends "base.html" %}
+
+{% block title %}{{ disciplina.nome }} - {{ app_name }}{% endblock %}
+
+{% block content %}
+<section class="card">
+    <div class="disciplina-header">
+        <h2>
+            <i class="fas fa-book"></i> {{ disciplina.nome }}
+            <span class="prioridade {{ disciplina.prioridade }}">{{ disciplina.prioridade }}</span>
+        </h2>
+        <div class="disciplina-meta">
+            <span><i class="fas fa-trophy"></i> <a href="{{ url_for('view_concurso', id_concurso=disciplina.id_concurso) }}">{{ disciplina.nome_concurso }}</a></span>
+            <span><i class="fas fa-calendar-day"></i> Prova: {{ disciplina.data_prova|datetimeformat }}</span>
+            <span class="dias-restantes {% if dias_restantes < 30 %}urgente{% elif dias_restantes < 90 %}atencao{% endif %}">
+                <i class="fas fa-clock"></i> {{ dias_restantes }} dias restantes
+            </span>
+        </div>
+    </div>
+
+   <div style="display: flex; align-items: center; gap: 8px;">
+    <span style="font-size: 0.85rem; color: #666; font-weight: 500;">
+        {{ progresso }}%
+    </span>
+    <div style="flex-grow: 1; height: 4px; background-color: #e0e0e0; border-radius: 2px;">
+        <div style="height: 100%; background-color: #4CAF50; width: {{ progresso }}%;"></div>
+    </div>
+</div>
+</div>
+
+    <div class="disciplina-actions">
+        <button class="btn-primary" onclick="document.getElementById('modal-adicionar-topico').style.display='block'">
+            <i class="fas fa-plus"></i> Adicionar Tópico
+        </button>
+        
+        <form action="{{ url_for('importar_topicos', id_disciplina=disciplina.id) }}" method="POST" enctype="multipart/form-data" class="inline-form">
+            <label for="file-import" class="btn-secondary">
+                <i class="fas fa-file-import"></i> Importar Tópicos
+                <input id="file-import" type="file" name="arquivo" accept=".txt" style="display: none;" onchange="this.form.submit()">
+            </label>
+        </form>
+    </div>
+</section>
+
+<section class="card">
+    <h3><i class="fas fa-list"></i> Tópicos da Disciplina</h3>
+    
+    <table class="topicos-table">
+        <thead>
+            <tr>
+                <th>Tópico</th>
+                <th style="width: 100px;">Prioridade</th>
+                <th style="width: 80px;">Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for topico in topicos %}
+            <tr class="topico-row {% if topico.estudado %}estudado{% endif %}">
+                <td class="topico-nome">{{ topico.nome }}</td>
+                <td class="topico-prioridade">
+                    <span class="tag {{ topico.prioridade }}">{{ topico.prioridade }}</span>
+                </td>
+                <td class="topico-status">
+                    <form action="{{ url_for('atualizar_status_topico', id_topico=topico.id) }}" method="POST" class="status-form">
+                        {% if topico.estudado %}
+                        <input type="hidden" name="estudado" value="0">
+                        <button type="submit" class="btn-status estudado" title="Marcar como não estudado">
+                            <i class="fas fa-check-circle"></i> Estudado
+                        </button>
+                        {% else %}
+                        <input type="hidden" name="estudado" value="1">
+                        <button type="submit" class="btn-status pendente" title="Marcar como estudado">
+                            <i class="fas fa-circle"></i> Não estudado
+                        </button>
+                        {% endif %}
+                    </form>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="3" class="empty-state">
+                    <i class="fas fa-book-open"></i>
+                    <p>Nenhum tópico cadastrado ainda. Adicione tópicos ou importe de um arquivo.</p>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+
+<!-- Modal Adicionar Tópico -->
+<div id="modal-adicionar-topico" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="document.getElementById('modal-adicionar-topico').style.display='none'">&times;</span>
+        <h3><i class="fas fa-plus-circle"></i> Adicionar Tópico</h3>
+        
+        <form action="{{ url_for('adicionar_topico', id_disciplina=disciplina.id) }}" method="POST">
+            <div class="form-group">
+                <label for="nome-topico">Nome do Tópico:</label>
+                <input type="text" id="nome-topico" name="nome" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="prioridade-topico">Prioridade:</label>
+                <select id="prioridade-topico" name="prioridade">
+                    <option value="alta">Alta</option>
+                    <option value="media" selected>Média</option>
+                    <option value="baixa">Baixa</option>
+                </select>
+            </div>
+            
+            <div class="form-actions">
+                <button type="button" class="btn-secondary" onclick="document.getElementById('modal-adicionar-topico').style.display='none'">Cancelar</button>
+                <button type="submit" class="btn-primary">Salvar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .topicos-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .topicos-table th, .topicos-table td {
+        padding: 10px;
+        border-bottom: 1px solid #eee;
+        text-align: left;
+    }
+    
+    .topicos-table th {
+        background-color: #f8f9fa;
+        font-weight: 600;
+    }
+    
+    .topico-row {
+        transition: background-color 0.2s;
+    }
+    
+    .topico-row:hover {
+        background-color: #f8f9fa;
+    }
+    
+    .topico-row.estudado {
+        background-color: #f0fff4;
+    }
+    
+    .btn-status {
+        border: none;
+        border-radius: 4px;
+        padding: 6px 12px;
+        font-size: 0.9em;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        width: 100%;
+    }
+    
+    .btn-status.estudado {
+        background-color: #d4edda;
+        color: #155724;
+    }
+    
+    .btn-status.estudado:hover {
+        background-color: #c3e6cb;
+    }
+    
+    .btn-status.pendente {
+        background-color: #f8f9fa;
+        color: #6c757d;
+    }
+    
+    .btn-status.pendente:hover {
+        background-color: #e9ecef;
+    }
+    
+    .tag {
+        display: inline-block;
+        padding: 3px 8px;
+        border-radius: 12px;
+        font-size: 0.8em;
+        text-transform: uppercase;
+    }
+    
+    .tag.alta {
+        background-color: #fed7d7;
+        color: #c53030;
+    }
+    
+    .tag.media {
+        background-color: #feebc8;
+        color: #c05621;
+    }
+    
+    .tag.baixa {
+        background-color: #e6fffa;
+        color: #2c7a7b;
+    }
+    
+    .inline-form {
+        display: inline;
+    }
+    
+    .status-form {
+        margin: 0;
+    }
+</style>
+
+<script>
+// Fechar modais ao clicar fora
+window.onclick = function(event) {
+    if (event.target.className === 'modal') {
+        event.target.style.display = 'none';
+    }
+}
+</script>
+{% endblock %}

@@ -1,0 +1,622 @@
+:root {
+    --primary: #4361ee;
+    --secondary: #3f37c9;
+    --success: #4cc9f0;
+    --danger: #f72585;
+    --light: #f8f9fa;
+    --dark: #212529;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    background-color: #f5f5f5;
+    color: #333;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+header {
+    background: var(--primary);
+    color: white;
+    padding: 1rem 0;
+    margin-bottom: 2rem;
+}
+
+header h1 {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+nav {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.card {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.alert {
+    padding: 0.75rem 1.25rem;
+    margin-bottom: 1rem;
+    border-radius: 4px;
+}
+
+.alert-error {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.btn-primary {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.btn-primary:hover {
+    background: var(--secondary);
+}
+
+.btn-small {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 0.3rem 0.6rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.btn-small:hover {
+    background: var(--secondary);
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group input, .form-group select {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.grid-concursos {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.concurso-card {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 1rem;
+    text-decoration: none;
+    color: inherit;
+}
+
+.concurso-card:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.progress-container {
+    height: 20px;
+    background: #eee;
+    border-radius: 4px;
+    margin-top: 0.5rem;
+    position: relative;
+}
+
+.progress-bar {
+    height: 100%;
+    background: var(--success);
+    border-radius: 4px;
+}
+
+.progress-container span {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 0.8rem;
+    color: black;
+    text-shadow: 0 0 2px rgba(0,0,0,0.5);
+}
+
+.empty-state {
+    text-align: center;
+    padding: 2rem;
+    color: #666;
+}
+
+.empty-state i {
+    margin-bottom: 1rem;
+    color: var(--primary);
+}
+
+.disciplina-card {
+    margin: 1.5rem 0;
+    padding: 1rem;
+    border: 1px solid #eee;
+    border-radius: 8px;
+}
+
+.disciplina-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.disciplina-header h3 {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.prioridade {
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    text-transform: capitalize;
+}
+
+.prioridade.alta {
+    background: #ffdddd;
+    color: #d32f2f;
+}
+
+.prioridade.media {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.prioridade.baixa {
+    background: #d4edda;
+    color: #155724;
+}
+
+.topicos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.topico-card {
+    padding: 1rem;
+    border: 1px solid #eee;
+    border-radius: 8px;
+}
+
+.topico-card.estudado {
+    background: #f8f9fa;
+}
+
+.topico-card h4 {
+    margin-bottom: 0.5rem;
+}
+
+.form-estudo {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.form-estudo .form-group {
+    flex: 1;
+    margin-bottom: 0;
+}
+
+footer {
+    text-align: center;
+    padding: 1rem;
+    background: var(--dark);
+    color: white;
+    margin-top: 2rem;
+}
+
+@media (max-width: 768px) {
+    .grid-concursos {
+        grid-template-columns: 1fr;
+    }
+    
+    .topicos-grid {
+        grid-template-columns: 1fr;
+    }
+	"""
+.timeline {
+    margin-top: 2rem;
+    border-left: 3px solid var(--primary);
+    padding-left: 1rem;
+}
+
+.timeline-day {
+    margin-bottom: 2rem;
+    position: relative;
+}
+
+.timeline-date {
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.timeline-content {
+    background: white;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    position: relative;
+}
+
+.timeline-content::before {
+    content: '';
+    position: absolute;
+    left: -1.3rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--primary);
+}
+
+.hours {
+    display: inline-block;
+    padding: 0.2rem 0.5rem;
+    background: var(--primary);
+    color: white;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    margin-top: 0.5rem;
+}
+
+.import-form {
+    margin: 1rem 0;
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.cronograma-form {
+    margin-top: 2rem;
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    }
+}
+/* Estilos para o template concurso.html */
+.concurso-header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.concurso-header h2 {
+    margin: 0;
+    font-size: 1.8rem;
+    color: var(--primary);
+}
+
+.concurso-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.concurso-meta span {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.dias-restantes {
+    font-weight: bold;
+    padding: 0.3rem 0.6rem;
+    border-radius: 4px;
+}
+
+.dias-restantes.urgente {
+    background-color: #ffdddd;
+    color: #d32f2f;
+}
+
+.dias-restantes.atencao {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.concurso-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.inline-form {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.disciplina-card {
+    margin-bottom: 2rem;
+}
+
+.disciplina-header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #eee;
+}
+
+.disciplina-header h3 {
+    margin: 0;
+    font-size: 1.3rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.prioridade {
+    font-size: 0.8rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    text-transform: capitalize;
+}
+
+.prioridade.alta {
+    background-color: #ffdddd;
+    color: #d32f2f;
+}
+
+.prioridade.media {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.prioridade.baixa {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.peso {
+    font-size: 0.8rem;
+    color: #666;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.disciplina-progress {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.disciplina-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-icon {
+    background: none;
+    border: none;
+    color: var(--primary);
+    cursor: pointer;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.3rem 0.6rem;
+    border-radius: 4px;
+}
+
+.btn-icon:hover {
+    background-color: #f0f0f0;
+}
+
+.topicos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.topico-card {
+    background: white;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 1rem;
+    transition: all 0.3s ease;
+}
+
+.topico-card:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+}
+
+.topico-card.estudado {
+    background-color: #f8f9fa;
+    opacity: 0.8;
+}
+
+.topico-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.topico-header h4 {
+    margin: 0;
+    font-size: 1rem;
+}
+
+.topico-info {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.topico-info div {
+    margin: 0.3rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.form-estudo {
+    margin-top: 0.5rem;
+    display: flex;
+    gap: 0.5rem;
+}
+
+.form-estudo .form-group {
+    flex: 1;
+    display: flex;
+    gap: 0.5rem;
+}
+
+.form-estudo input,
+.form-estudo select {
+    padding: 0.3rem;
+    font-size: 0.9rem;
+}
+
+/* Modal styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+}
+
+.modal-content {
+    background-color: white;
+    margin: 10% auto;
+    padding: 1.5rem;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.modal h3 {
+    margin-top: 0;
+    color: var(--primary);
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 1.5rem;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close:hover {
+    color: #333;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.3rem;
+    font-weight: bold;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+}
+
+@media (max-width: 768px) {
+    .topicos-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .concurso-header,
+    .disciplina-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .concurso-meta,
+    .disciplina-progress {
+        width: 100%;
+    }
+    
+    .modal-content {
+        margin: 20% auto;
+        width: 95%;
+    }
+}
